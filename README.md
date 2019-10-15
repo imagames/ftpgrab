@@ -12,6 +12,10 @@
   <a href="https://www.paypal.me/crazyws"><img src="https://img.shields.io/badge/donate-paypal-00457c.svg?logo=paypal&style=flat-square" alt="Donate Paypal"></a>
 </p>
 
+## Fork About
+
+This fork is intented to provide a version of FTPGrab compatible with old and/or outdated sFTP servers.
+
 ## About
 
 **FTPGrab** :zap: is a CLI application written in [Go](https://golang.org/) to grab :inbox_tray: your files from a remote FTP or SFTP server to your NAS, server or computer :computer:. With Go, this app can be used across many platforms :game_die: and architectures. This support includes Linux, FreeBSD, macOS and Windows on architectures like amd64, i386, ARM and others.

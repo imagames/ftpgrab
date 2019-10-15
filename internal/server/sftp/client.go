@@ -38,7 +38,14 @@ func New(config *model.SFTP) (*server.Client, error) {
 			ssh.Password(config.Password),
 		}
 	}
+	// add unsafe ciphers
+	var sshconfig ssh.Config
+	sshconfig.SetDefaults()
+	cipherOrder := sshconfig.Ciphers	
+	sshconfig.Ciphers = append(cipherOrder, "aes256-cbc", "aes128-cbc", "3des-cbc")	
+
 	sshConf = &ssh.ClientConfig{
+		Config:					 sshconfig,
 		User:            config.Username,
 		Auth:            sshAuth,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
