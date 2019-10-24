@@ -29,6 +29,9 @@ download:
   retry: 3
   hide_skipped: false
   create_basedir: false
+  dup_with_ts: true
+  dup_with_ts_layout: WTS_2006-02-01
+  dup_with_ts_filter: (.csv|.CSV)$
 
 notif:
   mail:

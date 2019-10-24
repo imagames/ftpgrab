@@ -15,4 +15,7 @@ type Download struct {
 	Retry         int       `yaml:"retry,omitempty"`
 	HideSkipped   bool      `yaml:"hide_skipped,omitempty"`
 	CreateBasedir bool      `yaml:"create_basedir,omitempty"`
+	DupWithTs 		bool      `yaml:"dup_with_ts,omitempty"`
+	DupWithTsLayout string    `yaml:"dup_with_ts_layout,omitempty"`
+	DupWithTsFilter string    `yaml:"dup_with_ts_filter,omitempty"`
 }

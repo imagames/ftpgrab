@@ -2,8 +2,11 @@ package app
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
+	"regexp"
 	"runtime"
 	"sync/atomic"
 	"time"
@@ -282,8 +285,44 @@ func (fg *FtpGrab) retrieve(base string, src string, dest string, file os.FileIn
 		if err = os.Chtimes(destpath, file.ModTime(), file.ModTime()); err != nil {
 			sublogger.Warn().Err(err).Msg("Cannot change modtime of destination file")
 		}
-	}
 
+		// allow file duplication by appending a timestamp, allowing change
+		// tracking between synchronizations for certain file types
+		if fg.cfg.Download.DupWithTs {
+			if fg.cfg.Download.DupWithTsFilter != "" {
+				r, _ := regexp.Compile(fg.cfg.Download.DupWithTsFilter)
+				if r.MatchString(file.Name()) {
+					// copy downloaded file but append timestamp
+					input, err := ioutil.ReadFile(destpath)
+					if err != nil {
+						sublogger.Warn().Err(err).Msg("Could not read downloaded file for copy")
+						return nil
+					}
+					prefix := time.Now().Format(fg.cfg.Download.DupWithTsLayout)
+					duplicatedFilePath := filepath.Join(destfolder, prefix+"_"+file.Name())
+					// if a previous file exists with the same name, it will be truncated
+					err = ioutil.WriteFile(duplicatedFilePath, input, os.FileMode(fg.cfg.Download.ChmodFile))
+					if err != nil {
+						sublogger.Warn().Err(err).Msg("Could not duplicate " + duplicatedFilePath)
+						return nil
+					}
+					sublogger.Info().
+						Str("dest", duplicatedFilePath).
+						Str("prefix", prefix).
+						Msg("Successfully duplicated file")
+
+					// update modtime of the duplicated file time
+					if err = os.Chtimes(duplicatedFilePath, file.ModTime(), file.ModTime()); err != nil {
+						sublogger.Warn().Err(err).Msg("Cannot change modtime of duplicated file")
+					}
+
+				} else {
+					sublogger.Info().Str("file", file.Name()).Msg("Skipping file duplication")
+				}
+			}
+		}
+
+	}
 	return jnlEntry
 }
 
